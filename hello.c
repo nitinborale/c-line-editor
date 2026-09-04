@@ -4,7 +4,7 @@ void greet(const char *name) {
      } 
 int main()
 {
-    greet("Alice");
+    greet("ada");
 
     return 0;
     }
