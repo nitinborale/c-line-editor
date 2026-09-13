@@ -7,4 +7,4 @@ int main()
     greet("ada");
 
     return 0;
-    }
+}
