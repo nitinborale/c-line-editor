@@ -28,11 +28,9 @@ void insert_line(int line_num, const char *text) {
         printf("Error: Document is full.\n");
         return;
     }
-    // Shift existing lines down
     for (int i = line_count; i >= line_num; i--) {
         strcpy(lines[i], lines[i - 1]);
     }
-    // Insert new text at the specified index (0-indexed)
     strcpy(lines[line_num - 1], text);
     line_count++;
     printf("Line inserted successfully.\n");
@@ -40,71 +38,53 @@ void insert_line(int line_num, const char *text) {
 
 void delete_line(int line_num) {
     if (line_num < 1 || line_num > line_count) {
-        printf("Error: Line number does not exist[cite: 1].\n");
+        printf("Error: Line number does not exist.\n");
         return;
     }
-    // Shift subsequent lines up
     for (int i = line_num - 1; i < line_count - 1; i++) {
         strcpy(lines[i], lines[i + 1]);
     }
     line_count--;
-    printf("Line deleted successfully[cite: 1].\n");
+    printf("Line deleted successfully.\n");
 }
 
 int main() {
-    int choice;
+    char input[MAX_LEN];
+    char cmd;
     int line_num;
     char text[MAX_LEN];
 
-    do {
-        printf("\nLine Editor Menu:\n");
-        printf("1. Display Document\n");
-        printf("2. Insert Line\n");
-        printf("3. Delete Line\n");
-        printf("4. Exit\n");
-        printf("Enter your choice: ");
-        
-        if (scanf("%d", &choice) != 1) {
-            printf("Invalid input. Please enter a number[cite: 1].\n");
-            while(getchar() != '\n'); // clear buffer
-            continue;
-        }
-        while(getchar() != '\n'); // clear newline
+    printf("Simple Line Editor. Commands: p, i <num> <text>, d <num>, q\n");
+    
+    while (1) {
+        printf("\n> ");
+        if (!fgets(input, sizeof(input), stdin)) break;
+        input[strcspn(input, "\n")] = 0; 
 
-        switch (choice) {
-            case 1:
-                display_document();
-                break;
-            case 2:
-                printf("Enter line number to insert at: ");
-                if (scanf("%d", &line_num) != 1) {
-                    printf("Invalid line number[cite: 1].\n");
-                    while(getchar() != '\n');
-                    break;
-                }
-                while(getchar() != '\n');
-                printf("Enter text: ");
-                fgets(text, sizeof(text), stdin);
-                text[strcspn(text, "\n")] = 0; // remove trailing newline
+        if (strlen(input) == 0) continue;
+
+        cmd = input[0];
+
+        if (cmd == 'q') {
+            printf("Exiting editor and freeing memory.\n");
+            break;
+        } else if (cmd == 'p') {
+            display_document();
+        } else if (cmd == 'i') {
+            if (sscanf(input, "i %d %[^\n]", &line_num, text) == 2) {
                 insert_line(line_num, text);
-                break;
-            case 3:
-                printf("Enter line number to delete: ");
-                if (scanf("%d", &line_num) != 1) {
-                    printf("Invalid line number[cite: 1].\n");
-                    while(getchar() != '\n');
-                    break;
-                }
-                while(getchar() != '\n');
+            } else {
+                printf("Usage: i <line_number> <text>\n");
+            }
+        } else if (cmd == 'd') {
+            if (sscanf(input, "d %d", &line_num) == 1) {
                 delete_line(line_num);
-                break;
-            case 4:
-                printf("Exiting editor.\n");
-                break;
-            default:
-                printf("Invalid choice. Try again[cite: 1].\n");
+            } else {
+                printf("Usage: d <line_number>\n");
+            }
+        } else {
+            printf("Unknown command. Type 'p', 'i', 'd', or 'q'.\n");
         }
-    } while (choice != 4);
-
+    }
     return 0;
 }
